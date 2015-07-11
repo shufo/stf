@@ -10,6 +10,8 @@ app_scheme: http
 app_domain: stf.example.org
 app_url: "{{ app_scheme }}://{{ app_domain }}"
 
+auth_method: "auth-oauth2"
+
 consul_server_ip: localhost
 
 env_values:

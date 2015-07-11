@@ -6,7 +6,7 @@ StfAdbd:
   environment:
     SERVICE_NAME: "StfAdbd"
     SERVICE_TAGS: "StfAdbd"
-  
+
 StfRethinkdbProxy:
   image: ctlc/ambassador:latest
   ports:
@@ -20,9 +20,9 @@ StfRethinkdbProxy:
 StfApp:
   image: openstf/stf:1.0.0
   command: >
-    stf app 
-    --port 3000  
-    --auth-url {{ app_url }}/auth/oauth 
+    stf app
+    --port 3000
+    --auth-url {{ app_url }}/auth/oauth
     --websocket-url {{ app_url }}
   restart: always
   environment:
@@ -33,9 +33,9 @@ StfApp:
 StfAuth:
   image: openstf/stf:1.0.0
   command: >
-    stf auth-oauth2 
+    stf {{ auth_method }}
     --app-url {{ app_url }}
-    --port 3000 
+    --port 3000
   restart: always
   environment:
     SECRET: "foobar"
@@ -48,31 +48,39 @@ StfAuth:
     OAUTH_CALLBACK_URL:
     OAUTH_CLIENT_ID:
     OAUTH_CLIENT_SECRET:
+    LDAP_URL:
+    LDAP_TIMEOUT:
+    LDAP_BIND_DN:
+    LDAP_BIND_CREDENTIALS:
+    LDAP_SEARCH_DN:
+    LDAP_SEARCH_SCOPE:
+    LDAP_SEARCH_CLASS:
+    LDAP_SEARCH_FIELD:
 
 StfProcessor:
   image: openstf/stf:1.0.0
   command: >
-    stf processor 
-    stf-proceccor 
-    --connect-app-dealer tcp://StfTriproxyApp.service.consul:7160 
+    stf processor
+    stf-proceccor
+    --connect-app-dealer tcp://StfTriproxyApp.service.consul:7160
     --connect-dev-dealer tcp://StfTriproxyDev.service.consul:7260
   restart: always
   environment:
     SERVICE_NAME: "StfProcessor"
     SERVICE_TAGS: "StfProcessor"
-  
+
 StfProvider:
   image: openstf/stf:1.0.0
   command: >
-    stf provider 
+    stf provider
     --name "stf-provider"
     --connect-sub "tcp://StfTriproxyDev.service.consul:7250"
     --connect-push "tcp://StfTriproxyDev.service.consul:7270"
-    --storage-url {{ app_url }} 
-    --public-ip 172.17.8.101 
-    --min-port=15000 
-    --max-port=25000 
-    --heartbeat-interval 30000 
+    --storage-url {{ app_url }}
+    --public-ip 172.17.8.101
+    --min-port=15000
+    --max-port=25000
+    --heartbeat-interval 30000
     --screen-ws-url-pattern "wss://stf.example.org/d/%i/<%= serial %>/<%= publicPort %>/"
   net: "host"
   restart: always
@@ -84,8 +92,8 @@ StfReaper:
   image: openstf/stf:1.0.0
   command: >
     stf reaper dev
-    --connect-push tcp://StfTriproxyDev.service.consul:7270 
-    --connect-sub tcp://StfTriproxyApp.service.consul:7150 
+    --connect-push tcp://StfTriproxyDev.service.consul:7270
+    --connect-sub tcp://StfTriproxyApp.service.consul:7150
     --heartbeat-timeout 30000
   restart: always
   environment:
@@ -95,7 +103,7 @@ StfReaper:
 StfStoragePluginApk:
   image: openstf/stf:1.0.0
   command: >
-    stf storage-plugin-apk --port 3000 
+    stf storage-plugin-apk --port 3000
     --storage-url {{ app_url }}
   restart: always
   environment:
@@ -105,7 +113,7 @@ StfStoragePluginApk:
 StfStoragePluginImage:
   image: openstf/stf:1.0.0
   command: >
-    stf storage-plugin-image --port 3000 
+    stf storage-plugin-image --port 3000
     --storage-url {{ app_url }}
   restart: always
   environment:
@@ -125,9 +133,9 @@ StfStorageTemp:
 StfTriproxyApp:
   image: openstf/stf:1.0.0
   command: >
-    stf triproxy app 
-    --bind-pub "tcp://*:7150" 
-    --bind-dealer "tcp://*:7160" 
+    stf triproxy app
+    --bind-pub "tcp://*:7150"
+    --bind-dealer "tcp://*:7160"
     --bind-pull "tcp://*:7170"
   expose:
     - "7150"
@@ -141,9 +149,9 @@ StfTriproxyApp:
 StfTriproxyDev:
   image: openstf/stf:1.0.0
   command: >
-    stf triproxy dev 
-    --bind-pub "tcp://*:7250" 
-    --bind-dealer "tcp://*:7260" 
+    stf triproxy dev
+    --bind-pub "tcp://*:7250"
+    --bind-dealer "tcp://*:7260"
     --bind-pull "tcp://*:7270"
   expose:
     - "7250"
@@ -157,9 +165,9 @@ StfTriproxyDev:
 StfWebsocket:
   image: openstf/stf:1.0.0
   command: >
-    stf websocket --port 3000 
-    --storage-url {{ app_url }} 
-    --connect-sub tcp://StfTriproxyApp.service.consul:7150 
+    stf websocket --port 3000
+    --storage-url {{ app_url }}
+    --connect-sub tcp://StfTriproxyApp.service.consul:7150
     --connect-push tcp://StfTriproxyApp.service.consul:7170
   restart: always
   environment:

@@ -134,9 +134,21 @@ http {
       proxy_set_header X-Real-IP $remote_addr;
     }
 
+{% if auth_method == "auth-mock" %}
+    location /auth/mock/ {
+      proxy_pass http://StfAuth/auth/mock/;
+    }
+{% endif %}
+{% if auth_method == "auth-oauth2" %}
     location /auth/oauth/ {
       proxy_pass http://StfAuth/auth/oauth/;
     }
+{% endif %}
+{% if auth_method == "auth-ldap" %}
+    location /auth/ldap/ {
+      proxy_pass http://StfAuth/auth/ldap/;
+    }
+{% endif %}
 
     location /s/image/ {
       proxy_pass http://StfStoragePluginImage;
