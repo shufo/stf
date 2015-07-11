@@ -25,7 +25,7 @@ A setup scripts of [openstf/stf](https://github.com/openstf/stf/) with vagrant, 
 - Edit vars file to suit your environment. Replace `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` generated in above.
 
 ```
-vim ansivle/vars/loval.yml
+vim ansible/vars/local.yml
 
 use_ssl: no
 app_scheme: http
@@ -48,7 +48,7 @@ make install
 - Ensure application is properly launched.
 
 ```
-sudo echo "172.17.8.101 stf.example.org" > /etc/hosts
+sudo sh -c "echo '172.17.8.101 stf.example.org' >> /etc/hosts"
 ```
 
 then open http://stf.example.org/
