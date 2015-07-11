@@ -1,0 +1,27 @@
+---
+docker_version: 1.6.2
+docker_port: 2375
+docker_compose_version: 1.3.1
+docker_bin_path: ./bin/docker
+docker_compose_bin_path: ./bin/docker-compose
+
+use_ssl: no
+app_scheme: http
+app_domain: stf.example.org
+app_url: "{{ app_scheme }}://{{ app_domain }}"
+
+consul_server_ip: localhost
+
+env_values:
+  - { key: PATH, value: "{{ ansible_env.PWD }}/bin:$PATH" }
+  - { key: DOCKER_HOST, value: "tcp://172.17.8.101:{{ docker_port }}" }
+  - { key: STF_MOUNT_DIR, value: "/opt/stf" }
+  - { key: RETHINKDB_MOUNT_DIR, value: "/opt/rethinkdb" }
+  - { key: APP_URL, value: "{{ app_scheme }}://{{ app_domain }}" }
+  - { key: OAUTH_TOKEN_URL, value: "https://www.googleapis.com/oauth2/v4/token" }
+  - { key: OAUTH_AUTHORIZATION_URL, value: "https://accounts.google.com/o/oauth2/v2/auth" }
+  - { key: OAUTH_USERINFO_URL, value: "https://www.googleapis.com/oauth2/v3/userinfo" }
+  - { key: OAUTH_SCOPE, value: "\"openid email profile\"" }
+  - { key: OAUTH_CALLBACK_URL, value: "http://stf.example.org/auth/oauth/callback" }
+  - { key: OAUTH_CLIENT_ID, value: "replace_it" }
+  - { key: OAUTH_CLIENT_SECRET, value: "replace_it" }

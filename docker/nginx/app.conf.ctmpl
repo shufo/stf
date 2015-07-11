@@ -1,0 +1,29 @@
+upstream StfApp {
+  {{range service "StfApp"}}server {{.Address}}:{{.Port}};
+  {{else}}server 127.0.0.1:65535; # force a 502{{end}}
+}
+
+upstream StfAuth {
+  {{range service "StfAuth"}}server {{.Address}}:{{.Port}};
+  {{else}}server 127.0.0.1:65535; # force a 502{{end}}
+}
+
+upstream StfStoragePluginApk {
+  {{range service "StfStoragePluginApk"}}server {{.Address}}:{{.Port}};
+  {{else}}server 127.0.0.1:65535; # force a 502{{end}}
+}
+
+upstream StfStoragePluginImage {
+  {{range service "StfStoragePluginImage"}}server {{.Address}}:{{.Port}};
+  {{else}}server 127.0.0.1:65535; # force a 502{{end}}
+}
+
+upstream StfStorageTemp {
+  {{range service "StfStorageTemp"}}server {{.Address}}:{{.Port}};
+  {{else}}server 127.0.0.1:65535; # force a 502{{end}}
+}
+
+upstream StfWebsocket {
+  {{range service "StfWebsocket"}}server {{.Address}}:{{.Port}};
+  {{else}}server 127.0.0.1:65535; # force a 502{{end}}
+}

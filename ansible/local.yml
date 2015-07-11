@@ -1,0 +1,56 @@
+---
+- hosts: local
+  connection: local
+  vars_files:
+    - vars/local.yml
+  tasks:
+    - name: Ensure direnv is installed
+      local_action: homebrew name=direnv state=present
+      when: ansible_os_family == "Darwin"
+
+    - name: Ensure direnv is installed
+      local_action: get_url url=https://github.com/zimbatm/direnv/releases/download/v2.6.0/direnv.linux-amd64 dest=/usr/local/bin/direnv
+      when: ansible_system == "Linux" and ansible_architecture == "x86_64"
+
+    - name: Ensure direnv file is set
+      local_action: template src=templates/envrc.j2 dest=../.envrc
+
+    - name: echo current SHELL
+      local_action: shell echo $SHELL
+      register: shell
+      changed_when: false  
+      always_run: yes 
+
+    - name: Ensure direnv is loaded in shell(zsh)
+      local_action: lineinfile dest=~/.zshrc regexp='^eval\ \"\$\(direnv hook zsh\)\"' line='eval "$(direnv hook zsh)"'
+      when: shell.stdout.find('zsh') != -1
+
+    - name: Ensure direnv is loaded in shell(bash)
+      local_action: lineinfile dest=~/.bashrc regexp='eval\ \"\$\(direnv hook bash\)\"' line='eval "$(direnv hook bash)"'
+      when: shell.stdout.find('bash') != -1
+
+    - name: Ensure direnv is allowed
+      shell: direnv allow
+      always_run: yes
+      changed_when: false
+
+    - name: Ensure docker client directory is present
+      file: path=./bin state=directory
+
+    - name: Ensure docker-compose is installed
+      local_action: get_url url=https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ ansible_os_family }}-{{ ansible_machine }} dest={{ docker_compose_bin_path }}
+
+    - name: Ensure docker-compose is executable
+      local_action: file path={{ docker_compose_bin_path }} mode=0755
+
+    - name: Ensure docker client is downloaded
+      get_url: url=https://get.docker.com/builds/Darwin/x86_64/docker-{{ docker_version }} dest={{ docker_bin_path }} mode=0755
+
+    - name: Ensure coreos bootstrap role is downloaded
+      shell: creates=./roles ansible-galaxy install -p roles defunctzombie.coreos-bootstrap
+
+    - name: Ensure compose file is generated
+      template: src=templates/stf.yml.j2 dest=../compose/stf.yml
+
+    - name: Ensure nginx.conf is generated
+      template: src=templates/nginx.conf.j2 dest=../docker/nginx/nginx.conf

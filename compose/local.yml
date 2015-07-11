@@ -1,0 +1,150 @@
+StfAdbd:
+  extends:
+    file: stf.yml
+    service: StfAdbd
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+  volumes:
+    - "/dev/bus/usb:/dev/bus/usb"
+
+StfRethinkdbProxy:
+  extends:
+    file: stf.yml
+    service: StfRethinkdbProxy
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+
+StfApp:
+  extends:
+    file: stf.yml
+    service: StfApp
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+  links:
+    - StfRethinkdbProxy:rethinkdb
+
+StfAuth:
+  extends:
+    file: stf.yml
+    service: StfAuth
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+
+StfProcessor:
+  extends:
+    file: stf.yml
+    service: StfProcessor
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+  links:
+    - StfRethinkdbProxy:rethinkdb
+
+StfProvider:
+  extends:
+    file: stf.yml
+    service: StfProvider
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+
+StfReaper:
+  extends:
+    file: stf.yml
+    service: StfReaper
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+  links:
+    - StfRethinkdbProxy:rethinkdb
+
+StfStoragePluginApk:
+  extends:
+    file: stf.yml
+    service: StfStoragePluginApk
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+
+StfStoragePluginImage:
+  extends:
+    file: stf.yml
+    service: StfStoragePluginImage
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+
+StfStorageTemp:
+  extends:
+    file: stf.yml
+    service: StfStorageTemp
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+  volumes:
+    - "/mnt/storage:/data"
+
+StfTriproxyApp:
+  extends:
+    file: stf.yml
+    service: StfTriproxyApp
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+
+StfTriproxyDev:
+  extends:
+    file: stf.yml
+    service: StfTriproxyDev
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+
+StfWebsocket:
+  extends:
+    file: stf.yml
+    service: StfWebsocket
+  dns:
+    - "172.17.8.101"
+    - "8.8.8.8"
+    - "8.8.4.4"
+  links:
+    - StfRethinkdbProxy:rethinkdb
+
+rethinkdb:
+  extends:
+    file: stf.yml
+    service: rethinkdb
+  volumes:
+    - "${RETHINKDB_MOUNT_DIR}:/data"
+
+consul:
+  extends:
+    file: stf.yml
+    service: consul 
+
+registrator:
+  extends:
+    file: stf.yml
+    service: registrator
+
+nginx:
+  extends:
+    file: stf.yml
+    service: nginx

@@ -1,0 +1,212 @@
+StfAdbd:
+  image: sorccu/adb:latest
+  privileged: true
+  net: "host"
+  restart: always
+  environment:
+    SERVICE_NAME: "StfAdbd"
+    SERVICE_TAGS: "StfAdbd"
+  
+StfRethinkdbProxy:
+  image: ctlc/ambassador:latest
+  ports:
+    - "28015"
+  restart: always
+  environment:
+    RETHINKDB_PORT_28015_TCP: "tcp://rethinkdb.service.consul:28015"
+    SERVICE_NAME: "StfRethinkdbProxy"
+    SERVICE_TAGS: "StfRethinkdbProxy"
+
+StfApp:
+  image: openstf/stf:1.0.0
+  command: >
+    stf app 
+    --port 3000  
+    --auth-url {{ app_url }}/auth/oauth 
+    --websocket-url {{ app_url }}
+  restart: always
+  environment:
+    SECRET: "foobar"
+    SERVICE_NAME: "StfApp"
+    SERVICE_TAGS: "StfApp"
+
+StfAuth:
+  image: openstf/stf:1.0.0
+  command: >
+    stf auth-oauth2 
+    --app-url {{ app_url }}
+    --port 3000 
+  restart: always
+  environment:
+    SECRET: "foobar"
+    SERVICE_NAME: "StfAuth"
+    SERVICE_TAGS: "StfAuth"
+    OAUTH_TOKEN_URL:
+    OAUTH_AUTHORIZATION_URL:
+    OAUTH_USERINFO_URL:
+    OAUTH_SCOPE:
+    OAUTH_CALLBACK_URL:
+    OAUTH_CLIENT_ID:
+    OAUTH_CLIENT_SECRET:
+
+StfProcessor:
+  image: openstf/stf:1.0.0
+  command: >
+    stf processor 
+    stf-proceccor 
+    --connect-app-dealer tcp://StfTriproxyApp.service.consul:7160 
+    --connect-dev-dealer tcp://StfTriproxyDev.service.consul:7260
+  restart: always
+  environment:
+    SERVICE_NAME: "StfProcessor"
+    SERVICE_TAGS: "StfProcessor"
+  
+StfProvider:
+  image: openstf/stf:1.0.0
+  command: >
+    stf provider 
+    --name "stf-provider"
+    --connect-sub "tcp://StfTriproxyDev.service.consul:7250"
+    --connect-push "tcp://StfTriproxyDev.service.consul:7270"
+    --storage-url {{ app_url }} 
+    --public-ip 172.17.8.101 
+    --min-port=15000 
+    --max-port=25000 
+    --heartbeat-interval 30000 
+    --screen-ws-url-pattern "wss://stf.example.org/d/%i/<%= serial %>/<%= publicPort %>/"
+  net: "host"
+  restart: always
+  environment:
+    SERVICE_NAME: "StfProvider"
+    SERVICE_TAGS: "StfProvider"
+
+StfReaper:
+  image: openstf/stf:1.0.0
+  command: >
+    stf reaper dev
+    --connect-push tcp://StfTriproxyDev.service.consul:7270 
+    --connect-sub tcp://StfTriproxyApp.service.consul:7150 
+    --heartbeat-timeout 30000
+  restart: always
+  environment:
+    SERVICE_NAME: "StfReaper"
+    SERVICE_TAGS: "StfReaper"
+
+StfStoragePluginApk:
+  image: openstf/stf:1.0.0
+  command: >
+    stf storage-plugin-apk --port 3000 
+    --storage-url {{ app_url }}
+  restart: always
+  environment:
+    SERVICE_NAME: "StfStoragePluginApk"
+    SERVICE_TAGS: "StfStoragePluginApk"
+
+StfStoragePluginImage:
+  image: openstf/stf:1.0.0
+  command: >
+    stf storage-plugin-image --port 3000 
+    --storage-url {{ app_url }}
+  restart: always
+  environment:
+    SERVICE_NAME: "StfStoragePluginImage"
+    SERVICE_TAGS: "StfStoragePluginImage"
+
+StfStorageTemp:
+  image: openstf/stf:1.0.0
+  command: >
+    stf storage-temp --port 3000
+    --save-dir /data
+  restart: always
+  environment:
+    SERVICE_NAME: "StfStorageTemp"
+    SERVICE_TAGS: "StfStorageTemp"
+
+StfTriproxyApp:
+  image: openstf/stf:1.0.0
+  command: >
+    stf triproxy app 
+    --bind-pub "tcp://*:7150" 
+    --bind-dealer "tcp://*:7160" 
+    --bind-pull "tcp://*:7170"
+  expose:
+    - "7150"
+    - "7160"
+    - "7170"
+  restart: always
+  environment:
+    SERVICE_NAME: "StfTriproxyApp"
+    SERVICE_TAGS: "StfTriproxyApp"
+
+StfTriproxyDev:
+  image: openstf/stf:1.0.0
+  command: >
+    stf triproxy dev 
+    --bind-pub "tcp://*:7250" 
+    --bind-dealer "tcp://*:7260" 
+    --bind-pull "tcp://*:7270"
+  expose:
+    - "7250"
+    - "7260"
+    - "7270"
+  restart: always
+  environment:
+    SERVICE_NAME: "StfTriproxyDev"
+    SERVICE_TAGS: "StfTriproxyDev"
+
+StfWebsocket:
+  image: openstf/stf:1.0.0
+  command: >
+    stf websocket --port 3000 
+    --storage-url {{ app_url }} 
+    --connect-sub tcp://StfTriproxyApp.service.consul:7150 
+    --connect-push tcp://StfTriproxyApp.service.consul:7170
+  restart: always
+  environment:
+    SECRET: "foobar"
+    SERVICE_NAME: "StfWebsocket"
+    SERVICE_TAGS: "StfWebsocket"
+
+rethinkdb:
+  image: rethinkdb:latest
+  environment:
+    SERVICE_NAME: "rethinkdb"
+    SERVICE_TAGS: "rethinkdb"
+
+consul:
+  command: -server -bootstrap -data-dir ./data -ui-dir /ui
+  image: progrium/consul:latest
+  ports:
+    - "8300"
+    - "8400"
+    - "8500"
+    - "8600/udp"
+  environment:
+    CONSUL_SERVER_ADDRESS:
+    - "affinity:container!=stf_consul_*"
+    - "SERVICE_NAME=consul"
+    - "SERVICE_TAGS=consul"
+  net: "host"
+  restart: always
+
+registrator:
+  command: -internal consul://127.0.0.1:8500
+  image: sttts/registrator:latest
+  volumes:
+    - "/var/run/docker.sock:/tmp/docker.sock"
+  environment:
+    - "affinity:container!=stf_registrator_*"
+    - "SERVICE_NAME=registrator"
+    - "SERVICE_TAGS=registrator"
+  net: "host"
+  restart: always
+
+nginx:
+  build: ../docker/nginx
+  environment:
+    - "affinity:container!=stf_nginx_*"
+    - "CONSUL_PORT_8500_TCP_ADDR=127.0.0.1"
+    - "SERVICE_NAME=nginx"
+    - "SERVICE_TAGS=nginx"
+  net: "host"
+  restart: always

@@ -1,0 +1,6 @@
+---
+docker_tls: no
+docker_port: 2375
+stf_mount_dir: /opt/stf
+rethinkdb_mount_dir: /opt/rethinkdb
+ansible_python_interpreter: "PATH=/home/core/bin:$PATH python"
