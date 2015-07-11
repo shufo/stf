@@ -11,3 +11,14 @@ res/build/
 rethinkdb_data/
 temp/
 tmp/
+LICENSE
+VERSION
+README.md
+Changelog.md
+Makefile
+Vagrantfile
+.vagrant
+example
+ansible
+docker
+.envrc
