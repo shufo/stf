@@ -10,3 +10,19 @@
 /rethinkdb_data/
 /temp/
 /tmp/
+
+# ansible
+ansible/bin/*
+ansible/roles
+
+# vagrant
+.vagrant
+
+# direnv
+.envrc
+
+# compose
+/compose/stf.yml
+
+# docker
+/docker/nginx/nginx.conf
