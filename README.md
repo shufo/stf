@@ -1,6 +1,6 @@
 # vagrant-stf
 
-A setup scripts of [openstf/stf](https://github.com/openstf/stf/) with vagrant, docker, ansible, nginx, consul, consul-template and registrator.
+A setup scripts of [openstf/stf](https://github.com/openstf/stf/) with vagrant, docker, docker-compose, ansible, nginx, consul, consul-template and registrator.
 
 ## Requirements
 

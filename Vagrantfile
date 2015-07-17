@@ -18,7 +18,7 @@ $vm_gui = false
 $vm_memory = 4096
 $expose_docker_tcp=2375
 $vm_cpus = 2
-$shared_folders = {"." => "/opt/app"}
+$shared_folders = {}
 $forwarded_ports = {}
 
 # Attempt to apply the deprecated environment variable NUM_INSTANCES to
@@ -104,6 +104,7 @@ Vagrant.configure("2") do |config|
         config.vm.provider :virtualbox do |vb, override|
           vb.customize ["modifyvm", :id, "--uart1", "0x3F8", "4"]
           vb.customize ["modifyvm", :id, "--uartmode1", serialFile]
+		  vb.customize ['modifyvm', :id, '--usb', 'on']
         end
       end
 

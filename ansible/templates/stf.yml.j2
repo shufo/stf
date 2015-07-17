@@ -18,7 +18,7 @@ StfRethinkdbProxy:
     SERVICE_TAGS: "StfRethinkdbProxy"
 
 StfApp:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf app
     --port 3000
@@ -31,7 +31,7 @@ StfApp:
     SERVICE_TAGS: "StfApp"
 
 StfAuth:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf {{ auth_method }}
     --app-url {{ app_url }}
@@ -58,7 +58,7 @@ StfAuth:
     LDAP_SEARCH_FIELD:
 
 StfProcessor:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf processor
     stf-proceccor
@@ -70,18 +70,18 @@ StfProcessor:
     SERVICE_TAGS: "StfProcessor"
 
 StfProvider:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf provider
     --name "stf-provider"
     --connect-sub "tcp://StfTriproxyDev.service.consul:7250"
     --connect-push "tcp://StfTriproxyDev.service.consul:7270"
     --storage-url {{ app_url }}
-    --public-ip 172.17.8.101
+    --public-ip 10.10.5.192
     --min-port=15000
     --max-port=25000
-    --heartbeat-interval 30000
-    --screen-ws-url-pattern "wss://stf.example.org/d/%i/<%= serial %>/<%= publicPort %>/"
+    --heartbeat-interval 10000
+    --screen-ws-url-pattern "wss://stf.example.org:3000/d/stf/<%= serial %>/<%= publicPort %>/"
   net: "host"
   restart: always
   environment:
@@ -89,7 +89,7 @@ StfProvider:
     SERVICE_TAGS: "StfProvider"
 
 StfReaper:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf reaper dev
     --connect-push tcp://StfTriproxyDev.service.consul:7270
@@ -101,7 +101,7 @@ StfReaper:
     SERVICE_TAGS: "StfReaper"
 
 StfStoragePluginApk:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf storage-plugin-apk --port 3000
     --storage-url {{ app_url }}
@@ -111,7 +111,7 @@ StfStoragePluginApk:
     SERVICE_TAGS: "StfStoragePluginApk"
 
 StfStoragePluginImage:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf storage-plugin-image --port 3000
     --storage-url {{ app_url }}
@@ -121,7 +121,7 @@ StfStoragePluginImage:
     SERVICE_TAGS: "StfStoragePluginImage"
 
 StfStorageTemp:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf storage-temp --port 3000
     --save-dir /data
@@ -131,7 +131,7 @@ StfStorageTemp:
     SERVICE_TAGS: "StfStorageTemp"
 
 StfTriproxyApp:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf triproxy app
     --bind-pub "tcp://*:7150"
@@ -147,7 +147,7 @@ StfTriproxyApp:
     SERVICE_TAGS: "StfTriproxyApp"
 
 StfTriproxyDev:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf triproxy dev
     --bind-pub "tcp://*:7250"
@@ -163,7 +163,7 @@ StfTriproxyDev:
     SERVICE_TAGS: "StfTriproxyDev"
 
 StfWebsocket:
-  image: openstf/stf:1.0.0
+  image: openstf/stf:1.0.3
   command: >
     stf websocket --port 3000
     --storage-url {{ app_url }}

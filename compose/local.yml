@@ -53,6 +53,8 @@ StfProvider:
   extends:
     file: stf.yml
     service: StfProvider
+  links:
+    - "StfAdbd:StfAdbd"
   dns:
     - "172.17.8.101"
     - "8.8.8.8"
